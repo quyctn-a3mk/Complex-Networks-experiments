@@ -5,14 +5,14 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Type, TypeV
 from common.lib.sgraph import SGraph
 from utils.basealgo import BaseAlgorithm
 
-from utils.ftg import FTG_MC, FTG_R
-from utils.tg import TG_MC, TG_R
+# from utils.ftg import FTG_MC, FTG_R
+from utils.tg import GreedyMCSC as G_MCSC, GreedyRevenue as G_R
 
 ALGO: Dict[str, List[Type[BaseAlgorithm]]] = {
-	"1" : FTG_MC,
-	"2" : FTG_R,
-	"3" : TG_MC,
-	"4" : TG_R,
+	# "1" : FTG_MC,
+	# "2" : FTG_R,
+	"3" : G_MCSC,
+	"4" : G_R,
 }
 
 def argumentParse():
