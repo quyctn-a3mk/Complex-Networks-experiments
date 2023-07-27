@@ -1,25 +1,27 @@
-import random
-import time
-import queue
 from copy import deepcopy
-from typing import Any, Callable, Dict, Set, List, Optional, Tuple, Type, TypeVar, Union
-import threading
+from typing import Any, Dict, Set, TypeVar, Union
 
 SelfBaseSamplingModel = TypeVar("SelfBaseSamplingModel", bound="BaseSamplingModel")
 
 class BaseSamplingModel:
-    def __init__(
+	def __init__(
 		self,
-        adjList : Dict[int, Union[Dict, Set]] = None,
-        reverse_edge: bool = True,
-        **kwargs
+		adjList : Dict[Any, Union[Dict, Set]] = None,
+		reverse_edge: bool = True,
+		**kwargs
 	) -> None:
-        self.adjList = adjList
-        self.reverse_edge = reverse_edge
-    @classmethod
-    def cInit(
-        cls, 
-        **kwargs
+		self.adjList = adjList
+		self.reverse_edge = reverse_edge
+	@classmethod
+	def cInit(
+		cls, 
+		adjList : Dict[Any, Union[Dict, Set]] = None,
+		reverse_edge: bool = True,
+		**kwargs
 	) -> SelfBaseSamplingModel:
-        obj = cls(**kwargs)
-        return obj
+		obj = cls(
+			adjList = adjList,
+			reverse_edge = reverse_edge,
+			**kwargs
+		)
+		return obj
