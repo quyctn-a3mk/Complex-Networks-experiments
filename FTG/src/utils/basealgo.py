@@ -6,6 +6,9 @@ from lib import sgraph
 from lib import sampling
 from lib import otpheap
 
+from common.lib.sgraph import SGraph
+from common.lib.ssampling import RIS
+
 MODEL: List[str] = ["IC", "LT",]
 METHOD : List[str] = ["RIS", "MC"]
 DEFAULT_NUM_SAMPLE = 1e2
@@ -17,10 +20,45 @@ SelfBaseAlgorithm = TypeVar("SelfBaseAlgorithm", bound="BaseAlgorithm")
 
 class BaseAlgorithm():
 	def __init__(
-		self,
-		**kwargs
-	) -> None:
-		pass
+			self,
+			graph: SGraph = None,
+			sample = None,
+			sampling_model: str = "IC",
+			sampling_method: str = "RIS",
+			num_sample: int = 0,
+			num_parallel_thread: int = 1,
+			**kwargs			 
+		) -> None:
+			if not graph:
+				self.graph = SGraph()
+			else:
+				self.graph = graph
+			##
+			if sampling_model not in ("IC", "LT"):
+				self.sampling_model= "IC"
+			else:
+				self.sampling_model = sampling_model
+			##
+			if sampling_method not in ("RIS", "MC"):
+				self.sampling_method = "RIS"
+			else:
+				self.sampling_method = sampling_method
+			##
+			if self.sampling_method == "RIS":
+				self.sample = RIS(graphNode = self.graph.graphNode, model = self.sampling_model)
+			# else:
+			# 	self.sample = MC()
+			##
+			if not 0 <= num_sample <= MAX_NUM_SAMPLE:
+				self.num_sample = 0
+			else:
+				self.num_sample = num_sample
+			##
+			if not 1 <= num_parallel_thread <= MAX_NUM_PARALLEL_THREAD:
+				self.num_parallel_thread = 1
+			else:
+				self.num_parallel_thread = num_parallel_thread
+			##
 	##
 	@classmethod
 	def cInit(cls, **kwargs):
