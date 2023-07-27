@@ -5,7 +5,7 @@ from copy import deepcopy
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
 import threading
 
-from ssampling.model.basesamplingmodel import BaseSamplingModel
+from ssampling.method.basesamplingmethod import BaseSamplingMethod
 
 DEFAULT_NUM_SAMPLE : int = 1e4
 MAX_NUM_SAMPLE : int = 1e8
@@ -18,7 +18,7 @@ class BaseSamplingMethod:
 	def __init__(
 		self,		
 		# sampling : Callable[... , List] = None,
-		model : Type[BaseSamplingModel],  ## require
+		model : Type[BaseSamplingMethod],  ## require
 		num_sample: int = DEFAULT_NUM_SAMPLE,
 		num_parallel_thread: int = DEFAULT_NUM_PARALLEL_THREAD,
 		**kwargs,
@@ -35,7 +35,7 @@ class BaseSamplingMethod:
 	@classmethod
 	def cInit(
 		cls, 
-		model : Type[BaseSamplingModel],  ## require
+		model : Type[BaseSamplingMethod],  ## require
 		num_sample: int = DEFAULT_NUM_SAMPLE,
 		num_parallel_thread: int = DEFAULT_NUM_PARALLEL_THREAD,
 		**kwargs
