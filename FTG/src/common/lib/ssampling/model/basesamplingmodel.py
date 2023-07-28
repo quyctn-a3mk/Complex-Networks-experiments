@@ -1,5 +1,4 @@
-from copy import deepcopy
-from typing import Any, Dict, Set, TypeVar, Union
+from typing import Any, List, Dict, Set, TypeVar, Union
 
 SelfBaseSamplingModel = TypeVar("SelfBaseSamplingModel", bound="BaseSamplingModel")
 
@@ -25,3 +24,5 @@ class BaseSamplingModel:
 			**kwargs
 		)
 		return obj
+	def sampling(self, seed_node: Any = None) -> List:
+		pass

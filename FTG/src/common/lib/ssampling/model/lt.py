@@ -1,7 +1,7 @@
 import random
 import queue
 from copy import deepcopy
-from typing import Any, Dict, Set, Union
+from typing import Any, List, Dict, Set, Union
 
 from ssampling.model.basesamplingmodel import BaseSamplingModel
 
@@ -45,12 +45,20 @@ class LinearThreshold(BaseSamplingModel):
 		except Exception as e:
 			print(f"{str(e)}")
 			return None
-	def sampling(self,):
-		rand_node = random.choice(list(self.adjList.keys()))
+		'''
+	inteface
+	seed_node: 
+	- RIS: target node, reverse_edge = True
+	- MC: source node, reverse_edge = False
+	'''
+	def sampling(self, seed_node: Any = None) -> List:
+		if not seed_node:
+			rand_node = random.choice(list(self.adjList.keys()))
+			seed_node = rand_node
 		Q = queue.Queue()
 		R = []
-		Q.put(rand_node)
-		R.append(rand_node)
+		Q.put(seed_node)
+		R.append(seed_node)
 		## influence spread
 		while not Q.empty():
 			v = Q.get()
