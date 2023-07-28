@@ -59,7 +59,8 @@ class SGraph(BaseGraph):
 	'''
 
 	'''
-	read from text file : edge list
+	read from text file : 
+	edge list
 	'''
 
 	'''
