@@ -1,4 +1,3 @@
-import random
 import time
 import queue
 from copy import deepcopy
@@ -15,7 +14,9 @@ MAX_NUM_PARALLEL_THREAD : int = 10
 WAIT_TIME : float = 0.01
 
 class MonteCarlo(BaseSamplingMethod):
-	threadList = {"mapping_thread": {}, "sampling_thread" : {}}
+	num_sample = None
+	num_parallel_thread = None
+	threadList = None
 	lock_thread = None
 	stopFlag = None
 	totalSample = None
@@ -24,15 +25,12 @@ class MonteCarlo(BaseSamplingMethod):
 	def __init__(
 		self,		
 		model : Type[BaseSamplingModel],  ## require
-		# num_sample: int = DEFAULT_NUM_SAMPLE,
-		# num_parallel_thread: int = DEFAULT_NUM_PARALLEL_THREAD,
 		reset: bool = True,
 		**kwargs,
 	) -> None:
 		super.__init__(
 			model = model,
-			# num_sample = num_sample,
-			# num_parallel_thread = num_parallel_thread
+			**kwargs
 		)
 		if reset:
 			self.__reset()
@@ -40,15 +38,11 @@ class MonteCarlo(BaseSamplingMethod):
 	def cInit(
 		cls, 
 		model : Type[BaseSamplingModel],  ## require
-		# num_sample: int = DEFAULT_NUM_SAMPLE,
-		# num_parallel_thread: int = DEFAULT_NUM_PARALLEL_THREAD,
 		reset: bool = True,
 		**kwargs
 	) -> Type[BaseSamplingMethod]:
 		obj = cls(
 			model = model,
-			# num_sample = num_sample,
-			# num_parallel_thread = num_parallel_thread,
 			reset = reset,
 			**kwargs
 		)
@@ -56,13 +50,12 @@ class MonteCarlo(BaseSamplingMethod):
 	'''
 	inteface
 	'''
-	def sampling(self, seed_node: Any = None):
+	def sampling(self, seed_node: Any = None) -> List:
 		return self.model.sampling(seed_node = seed_node)
 	def __reset(self,):
 		self.mappingQueue = queue.Queue()
-		self.RR = {}
 		self.sample = {}
-		self.active = {}
+		self.active = {} ##
 		self.totalSample = 0
 		self.stopFlag = False
 		self.threadList = []
@@ -117,7 +110,11 @@ class MonteCarlo(BaseSamplingMethod):
 	'''
 	interface
 	'''
-	def run_multithread(self, seed_node: Any = None, print_per: int = 100) -> None:
+	def run_multithread(
+		self, 
+		seed_node: Any = None, 
+		print_per: int = 100
+	) -> None:
 		def __divideZ(self,n,t,z):
 			if t == 0:
 				return None
@@ -172,18 +169,33 @@ class MonteCarlo(BaseSamplingMethod):
 	'''
 	interface
 	'''
-	def run_unithread(self, seed_node: Any = None, print_per: int = 100) -> None:
+	def run_unithread(
+		self, 
+		seed_node: Any = None, 
+		print_per: int = 100
+	) -> None:
 		if not 0 < print_per < MAX_NUM_SAMPLE:
 			print_per = self.num_sample
 		self.sampling_unithread(
 			seed_node = seed_node,
 			required = self.num_sample,
-			print_per = 100
+			print_per = print_per
 		)
 	'''
 	interface
 	'''
-	def run(self, seed_node: Any = None, print_per: int = 100, reset: bool = False) -> None:
+	def run(
+		self, 
+		num_sample: int = DEFAULT_NUM_SAMPLE,
+		num_parallel_thread: int = DEFAULT_NUM_PARALLEL_THREAD,
+		seed_node: Any = None, 
+		print_per: int = 100, 
+		reset: bool = False
+	) -> None:
+		if not 0 < num_sample < MAX_NUM_SAMPLE:
+			self.num_sample = DEFAULT_NUM_SAMPLE
+		if 0 < num_parallel_thread < MAX_NUM_PARALLEL_THREAD:
+			self.num_parallel_thread = DEFAULT_NUM_PARALLEL_THREAD
 		if reset:
 			self.__reset()
 		if self.num_parallel_thread > 1:
