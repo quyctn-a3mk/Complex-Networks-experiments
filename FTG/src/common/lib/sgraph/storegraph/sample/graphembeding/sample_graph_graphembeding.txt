@@ -1,0 +1,16 @@
+graphname
+sample_graph
+nodeembedbing
+../nodeembeding/sample_graph_nodeembeding.txt
+edgeembedbing
+../edgeembeding/adjlist/sample_graph_adjlist_edgeembeding.txt		
+representation
+edge_list, edgelist, EL
+directed
+true
+weighted
+weight
+multigraph
+false
+notes
+multigraph, sparse, graph

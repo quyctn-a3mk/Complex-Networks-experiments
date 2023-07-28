@@ -1,0 +1,22 @@
+{
+	"graph" : 
+	{
+		"graphname" : "sample_graph",
+		"nodeembedbing" : "../nodeembeding/sample_graph_nodeembeding.json",
+		"edgeembedbing" : "../edgeembeding/adjlist/sample_graph_adjlist_edgeembeding.json",
+		"representation" :
+		[
+			"adjacency_list", 
+			"adjlist", 
+			"AL"
+		],
+		"directed" : true,
+		"weighted" : "weight",
+		"multigraph" : false,
+		"notes" : 
+		[
+			"multigraph",
+			"sparse graph"
+		]
+	}
+}

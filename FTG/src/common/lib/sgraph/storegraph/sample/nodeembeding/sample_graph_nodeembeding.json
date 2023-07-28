@@ -1,0 +1,25 @@
+{
+	"node": 
+	{
+		"0": 
+		{
+			"label": "A", 
+			"color": "red"
+		},
+		"1": 
+		{
+			"label": "B", 
+			"color": "blue"
+		},
+		"2": 
+		{
+			"label": "C", 
+			"color": "green"
+		},
+		"3": 
+		{
+			"label": "D", 
+			"color": "yellow"
+		}
+	}
+}
