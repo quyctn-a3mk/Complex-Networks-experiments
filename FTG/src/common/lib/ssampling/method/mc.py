@@ -14,14 +14,13 @@ DEFAULT_NUM_PARALLEL_THREAD : int = 1
 MAX_NUM_PARALLEL_THREAD : int = 10
 WAIT_TIME : float = 0.01
 
-class ReverseInfluenceSampling(BaseSamplingMethod):
+class MonteCarlo(BaseSamplingMethod):
 	threadList = {"mapping_thread": {}, "sampling_thread" : {}}
 	lock_thread = None
-	mappingQueue = None
 	stopFlag = None
 	totalSample = None
 	sample = None
-	cover = None
+	active = None
 	def __init__(
 		self,		
 		model : Type[BaseSamplingModel],  ## require
@@ -63,7 +62,7 @@ class ReverseInfluenceSampling(BaseSamplingMethod):
 		self.mappingQueue = queue.Queue()
 		self.RR = {}
 		self.sample = {}
-		self.cover = {}
+		self.active = {}
 		self.totalSample = 0
 		self.stopFlag = False
 		self.threadList = []
@@ -71,9 +70,8 @@ class ReverseInfluenceSampling(BaseSamplingMethod):
 	def sample(self):
 		return deepcopy(self.sample)
 	@property
-	def cover(self):
-		return deepcopy(self.cover)
-				## unlocked
+	def active(self):
+		return deepcopy(self.active)
 	## threading loop function
 	def mapping_multithread(self,) -> None:
 		while not (self.mappingQueue.empty() and self.stopFlag):
@@ -81,14 +79,12 @@ class ReverseInfluenceSampling(BaseSamplingMethod):
 				time.sleep(WAIT_TIME) ## 1
 				continue
 			sampleID = self.mappingQueue.get()
-			## mapping sample to cover
+			## mapping sample to active
 			while True:
 				try:
 					for nodeID in self.sample[sampleID]:
-						if nodeID not in self.cover:
-							self.cover[nodeID] = set()
-						## add cover sample in to set of cover node u
-						self.cover[nodeID].add(sampleID)
+						if nodeID not in self.active:
+							self.active[nodeID] = sampleID
 				except Exception as e:
 					print(f"{str(e)}")
 					time.sleep(WAIT_TIME)
@@ -135,7 +131,7 @@ class ReverseInfluenceSampling(BaseSamplingMethod):
 		mappingThread.start()
 		self.lock_thread = threading.Lock()
 		self.sample = {}
-		self.cover = {}
+		self.active = {}
 		## create n sampling thread
 		required_split = []
 		__divideZ(n = self.num_sample, t = self.num_parallel_thread, z = required_split)
@@ -168,12 +164,11 @@ class ReverseInfluenceSampling(BaseSamplingMethod):
 				self.sample[sampleID] = R
 				self.totalSample += 1
 				for nodeID in self.sample[sampleID]:
-					if nodeID not in self.cover:
-						self.cover[nodeID] = set()
-					## add cover sample in to set of cover node u
-					self.cover[nodeID].add(sampleID)
-				if print_per and self.totalSample % print_per == 0:
+					if nodeID not in self.active:
+						self.active[nodeID] = sampleID
+			if print_per and self.totalSample % print_per == 0:
 					print(f"sampleID '{sampleID}'")
+		pass
 	'''
 	interface
 	'''
@@ -204,5 +199,5 @@ class ReverseInfluenceSampling(BaseSamplingMethod):
 	'''
 	inteface
 	'''
-	def estimation(self, ) -> float:
-		pass
+	def estimation(self) -> float:
+		return len(self.active) / self.totalSample
