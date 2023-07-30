@@ -1,6 +1,4 @@
-node
-0, 1, 2, 3
-label
-A, B, C, D
-color
-red, gren, blue, yellow
+node label color
+0 1 2 3
+A B C D
+red green blue yellow
