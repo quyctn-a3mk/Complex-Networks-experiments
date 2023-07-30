@@ -67,17 +67,9 @@ class ReadNodeEmbedding(BaseReadEmbedding):
 				raise Exception(f"No {key} has found")
 			node_list = lines[1].strip().split()
 			# Split each element of the list by space to get the values
-			values = [row.strip().split() for row in lines[1:]]
-			# data = {node:{header[i]:values[i+1] for i in range(len(header))} for node in node_list}
-			data = {
-				values[0]: {header[i]: values[i + 1] for i in range(len(header))} for values in zip(*values)
-			}
+			values = [row.strip().split() for row in lines[2:]]
+			data = {node_list[i]:{header[j]:values[j-1][i] for j in range(1, len(header))} for i in range(len(node_list))}	
 			print()
-			# Create the data dictionary from the lines
-			# for i in range(0, len(header)):
-			# 	key = header[i].strip()
-			# 	value = lines[i+1].strip()
-			# 	data[key] = value		
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -143,4 +135,4 @@ def test():
 	)
 	print(nodeEmbedding.node)
 
-test()
+# test()
