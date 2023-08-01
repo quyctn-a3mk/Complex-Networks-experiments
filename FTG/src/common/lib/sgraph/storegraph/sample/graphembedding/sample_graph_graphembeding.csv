@@ -1,0 +1,2 @@
+graphname,nodeembedding,edgeembedding,representation,directed,weighted,multigraph,notes
+sample_graph,../nodeembedding/sample_graph_nodeembedding.json,../edgeembedding/adjlist/sample_graph_adjlist_edgeembedding.json,"edge_list, edgelist, EL",true,weight,false,"multigraph, sparse graph"

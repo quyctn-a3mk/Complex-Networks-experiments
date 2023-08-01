@@ -2,8 +2,8 @@
 	"graph" : 
 	{
 		"graphname" : "sample_graph",
-		"nodeembedbing" : "../nodeembeding/sample_graph_nodeembeding.json",
-		"edgeembedbing" : "../edgeembeding/adjlist/sample_graph_adjlist_edgeembeding.json",
+		"nodeembedding" : "../nodeembedding/sample_graph_nodeembedding.json",
+		"edgeembedding" : "../edgeembedding/adjlist/sample_graph_adjlist_edgeembedding.json",
 		"representation" :
 		[
 			"adjacency_list", 
