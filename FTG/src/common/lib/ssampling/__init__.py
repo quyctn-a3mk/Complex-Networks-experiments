@@ -24,7 +24,7 @@ class SSampling:
 		self,
 		adjList : Dict[Any, Union[Dict, Set]] = None,
 		reverse_edge: bool = True,
-		method: Type[BaseSamplingModel] = METHOD["RIS"],
+        method: Type[BaseSamplingModel] = METHOD["RIS"],
 		method_kwargs : List[Any] = None,
 		model: Type[BaseSamplingMethod] = MODEL["IC"],
 		model_kwargs: List[Any] = None,
