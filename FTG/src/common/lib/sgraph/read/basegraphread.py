@@ -30,7 +30,7 @@ class BaseReadEmbedding:
 	def __init__(
 		self,
 	) -> None:
-		pass
+		self.data = None
 	'''
 	interface
 	'''

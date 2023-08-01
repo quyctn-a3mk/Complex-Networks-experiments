@@ -3,16 +3,15 @@ import argparse
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Type, TypeVar, Union
 
 from common.lib.sgraph import SGraph
-from utils.basealgo import BaseAlgorithm
+from algorithm.basealgo import BaseAlgorithm
 
-# from utils.ftg import FTG_MC, FTG_R
-from utils.tg import GreedyMCSC as G_MCSC, GreedyRevenue as G_R
+from algorithm.ftg import FastThresholdGreedy as FTG
+# from algorithm.tg import ThresholdGreedy as TG
 
-ALGO: Dict[str, List[Type[BaseAlgorithm]]] = {
-	# "1" : FTG_MC,
-	# "2" : FTG_R,
-	"3" : G_MCSC,
-	"4" : G_R,
+
+ALGO: Dict[str, Type[BaseAlgorithm]] = {
+	"1" : FTG,
+	# "2" : TG,
 }
 
 def argumentParse():

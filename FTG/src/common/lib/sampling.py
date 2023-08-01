@@ -12,7 +12,6 @@ class RIS:
 	lock_thread = None
 	mappingQueue = None
 	stopFlag = None
-	# RR = None
 	totalSample = None
 	sample = None
 	cover = None

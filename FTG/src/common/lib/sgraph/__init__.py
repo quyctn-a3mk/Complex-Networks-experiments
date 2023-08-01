@@ -6,7 +6,9 @@ import threading
 
 from sgraph.basegraph import BaseGraph
 
-from utils.readfile import readFile_ParseLine
+from sgraph.read.readgraphembedding import ReadGraphEmbedding
+from sgraph.read.readnodeembedding import ReadNodeEmbedding
+from sgraph.read.readedgeembedding import ReadEdgeEmbedding
 
 class SGraph(BaseGraph):
 	def __init__(
@@ -54,19 +56,3 @@ class SGraph(BaseGraph):
 			**kwargs
 		)
 		return obj
-	'''
-	read from CSV: edge list
-	'''
-
-	'''
-	read from text file : 
-	edge list
-	'''
-
-	'''
-	read from text file : adj list
-	'''
-
-	'''
-	read from text file : adj matrix
-	'''

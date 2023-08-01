@@ -6,7 +6,7 @@ import argparse
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from common.lib.sgraph import SGraph
-from utils.basealgo import BaseAlgorithm
+from basealgo import BaseAlgorithm
 
 MODEL: List[str] = ["IC", "LT",]
 METHOD : List[str] = ["RIS", "MC"]
