@@ -28,9 +28,9 @@ SOURCE_TARGET_LIST : List[str] = [
 T_SOURCE_TARGET_LIST = TypeVar("T_SOURCE_TARGET_LIST", bound=SOURCE_TARGET_LIST)
 
 EDGE_LIST_TARGET: Dict[str, List[ Dict[str, List]]] = {
-    "edge": [{
-		"target" : []
-	}]
+    "edge": {
+		"target" : ["<any_val>"]
+	}
 }
 
 T_EDGE_LIST_TARGET = TypeVar("T_EDGE_LIST_TARGET", bound=EDGE_LIST_TARGET)
@@ -103,17 +103,17 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 			if file_ext == ".txt":
 				return self.read_embedding_txt(
 					file_path = file_path,
-					rerp = repr
+					repr = repr
 				)
 			elif file_ext == ".json":
 				return self.read_embedding_json(
 					file_path = file_path,
-					rerp = repr
+					repr = repr
 				)
 			elif file_ext == ".csv":
 				return self.read_embedding_csv(
 					file_path = file_path,
-					rerp = repr
+					repr = repr
 				)
 			else:
 				raise ValueError("Unsupported edge embedding file format.")
@@ -134,25 +134,13 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		try:
 			if not repr or repr not in REPR:
 				print("Try to read in edgelist representation")
-				return self.read_embedding_txt_edgelist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_txt_edgelist(file_path = file_path)
 			if repr == "edgelist":
-				return self.read_embedding_txt_edgelist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_txt_edgelist(file_path = file_path)
 			elif repr == "adjlist":
-				return self.read_embedding_txt_adjlist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_txt_adjlist(file_path = file_path)
 			elif repr == "adjmatrix":
-				return self.read_embedding_txt_adjmatrix(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_txt_adjmatrix(file_path = file_path)
 			else:
 				raise ValueError("Unsupported edge embedding representation.")
 		except IOError as e:
@@ -166,7 +154,7 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		file_path: str
 	) -> bool:
 			try:
-				data = {}
+				data = []
 				with open(file_path, 'r') as txtfile:
 					lines = txtfile.readlines()
 				header = lines[0].strip().split()
@@ -178,10 +166,9 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 				):
 					raise Exception(f"Out of edge embedding format.")
 				# Create the data dictionary from the lines
-				for i in range(0, len(lines)):
-					key = lines[i].strip()  # Remove any leading/trailing whitespace or newline
-					value = lines[i + 1].strip()
-					data[key] = value
+				for i in range(1, len(lines)):
+					row = lines[i].strip().split()
+					data.append(dict(zip(header, row)))
 			except Exception as e:
 				print(f"{str(e)}")
 				return False
@@ -205,10 +192,9 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 				):
 					raise Exception(f"Out of edge embedding format.")
 				# Create the data dictionary from the lines
-				for i in range(0, len(lines)):
-					key = lines[i].strip()  # Remove any leading/trailing whitespace or newline
-					value = lines[i + 1].strip()
-					data[key] = value
+				for i in range(1, len(lines), len(header)):
+					node = lines[i].strip()[0]
+					data[node] = {header[j]:lines[i+j].strip().split() for j in range(1,len(header))}
 			except Exception as e:
 				print(f"{str(e)}")
 				return False
@@ -231,11 +217,16 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 					data=header
 				):
 					raise Exception(f"Out of edge embedding format.")
+				node_list = lines[1].strip().split()
+				data = {node:{} for node in node_list}
 				# Create the data dictionary from the lines
-				for i in range(0, len(lines)):
-					key = lines[i].strip()  # Remove any leading/trailing whitespace or newline
-					value = lines[i + 1].strip()
-					data[key] = value
+				att_i = 1
+				for i in range(2, len(lines), len(node_list)): ## 2-6-10
+					att = header[att_i]
+					for j in range(len(node_list)):	## 0-1-2-3
+						node = node_list[j]
+						data[node][att] = lines[i+j].strip().split()
+					att_i+=1
 			except Exception as e:
 				print(f"{str(e)}")
 				return False
@@ -250,25 +241,13 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		try:
 			if not repr or repr not in REPR:
 				print("Try to read in edgelist representation")
-				return self.read_embedding_json_edgelist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_json_edgelist(file_path = file_path)
 			if repr == "edgelist":
-				return self.read_embedding_json_edgelist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_json_edgelist(file_path = file_path)
 			elif repr == "adjlist":
-				return self.read_embedding_json_adjlist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_json_adjlist(file_path = file_path)
 			elif repr == "adjmatrix":
-				return self.read_embedding_json_adjmatrix(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_json_adjmatrix(file_path = file_path)
 			else:
 				raise ValueError("Unsupported edge embedding representation.")
 		except IOError as e:
@@ -277,7 +256,7 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		except Exception as e:
 			print(f"{str(e)}")
 			return False
-	def read_embedidng_json_edgelist(
+	def read_embedding_json_edgelist(
 		self,
 		file_path : str
 	) -> bool:
@@ -289,10 +268,8 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 				data=data
 			):
 				raise Exception(f"Out of edge embedding format.")
-			# if isinstance(data,dict) and key in data:
-			# 	data = data[key]
-			# else:
-			# 	raise Exception(f"something")
+			if "edge" in data:
+				data = data["edge"]
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -302,7 +279,7 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		else:
 			self.data = data
 			return True
-	def read_embedidng_json_adjlist(
+	def read_embedding_json_adjlist(
 		self,
 		file_path : str
 	) -> bool:
@@ -314,10 +291,8 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 				data=data
 			):
 				raise Exception(f"Out of edge embedding format.")
-			# if isinstance(data,dict) and key in data:
-			# 	data = data[key]
-			# else:
-			# 	raise Exception(f"something")
+			if "edge" in data:
+				data = data["edge"]
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -327,7 +302,7 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		else:
 			self.data = data
 			return True
-	def read_embedidng_json_adjmatrix(
+	def read_embedding_json_adjmatrix(
 		self,
 		file_path : str
 	) -> bool:
@@ -340,9 +315,8 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 			):
 				raise Exception(f"Out of edge embedding format.")
 			# if isinstance(data,dict) and key in data:
-			# 	data = data[key]
-			# else:
-			# 	raise Exception(f"something")
+			if "edge" in data:
+				data = data["edge"]
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -360,25 +334,13 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		try:
 			if not repr or repr not in REPR:
 				print("Try to read in edgelist representation")
-				return self.read_embedding_json_edgelist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_csv_edgelist(file_path = file_path)
 			if repr == "edgelist":
-				return self.read_embedding_json_edgelist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_csv_edgelist(file_path = file_path)
 			elif repr == "adjlist":
-				return self.read_embedding_json_adjlist(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_csv_adjlist(file_path = file_path)
 			elif repr == "adjmatrix":
-				return self.read_embedding_json_adjmatrix(
-					file_path = file_path,
-					repr= repr
-				)
+				return self.read_embedding_csv_adjmatrix(file_path = file_path)
 			else:
 				raise ValueError("Unsupported edge embedding representation.")
 		except IOError as e:
@@ -401,8 +363,6 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 					data=header
 				):
 					raise Exception(f"Out of node embedding format.")
-				# if not self.check_keys_exist(keys, header):
-				# 	raise Exception(f"No {keys} has found")
 				for row in csv_reader:
 					edge = row[0]
 					edge_atts = {
@@ -432,8 +392,6 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 					data=header
 				):
 					raise Exception(f"Out of node embedding format.")
-				# if not self.check_keys_exist(keys, header):
-				# 	raise Exception(f"No {keys} has found")
 				for row in csv_reader:
 					edge = row[0]
 					edge_atts = {
@@ -463,8 +421,6 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 					data=header
 				):
 					raise Exception(f"Out of node embedding format.")
-				# if not self.check_keys_exist(keys, header):
-				# 	raise Exception(f"No {keys} has found")
 				for row in csv_reader:
 					edge = row[0]
 					edge_atts = {
@@ -480,19 +436,84 @@ class ReadEdgeEmbedding(BaseReadEmbedding):
 		else:
 			self.data = data
 			return True
-	@staticmethod
-	def check_file_format(
-		template : Type[EDGE_EMBEDDING_TEMPLATE],
+	def deep_type_value(
+		self,
+		template: Any,
 		data: Any
 	) -> bool:
-		return True
-	# @staticmethod
-	# def check_keys_exist(
-	# 	keys : List[str, Dict[str, Any]] = ["source", "target"],
-	# 	atts : Union[List[str], Dict[str, Any]] = None,
-	# ): 
-	# 	if not keys or not atts:
-	# 		return False
-	# 	if all(key in atts for key in keys):
-	# 		return True
-	# 	return False
+			try:
+				if not data:
+					raise Exception(f"data was empty")
+				if not template:
+					raise Exception(f"template was empty")
+				if not type(data) == type(template):
+					raise Exception(f"data and template have different types.")
+				if isinstance(template, list) and isinstance(data, list):
+					for value in template:
+						if isinstance(value, str):
+							if value == "<any_key>" or value == "<any_val>":
+								continue
+							if value not in data:
+								raise Exception(f"Value '{value}' missing in data")
+						elif isinstance(value, dict):
+							for data_value in data:
+								if not self.deep_type_value(
+									template=value,
+									data=data_value
+								):
+									raise Exception(f"Value '{template_value}' maybe has wrong format in data")
+				elif isinstance(template, dict) and isinstance(data, dict):
+					template_keys = template.keys()
+					for key in template_keys:
+						# Key can be any 
+						if not key == "<any_key>":
+							if key not in data.keys():
+								raise Exception(f"Key '{key}' missing in data")
+						template_value = template[key]
+						if not template_value == "<any_val>":
+							if key == "<any_key>":
+								# get the only key
+								data_value = data[next(iter(data.keys()))]
+							else:
+								data_value = data[key]
+							## value can be empty object
+							if not data_value:
+								return None
+							if not isinstance(data_value, type(template_value)):
+								raise Exception(f"Data value not instance with template")
+							if isinstance(template_value, str) and isinstance(data_value, str):
+								if not template_value == data_value:
+									raise Exception(f"Value '{template_value} missing in data")
+								else:
+									return True
+							if not self.deep_type_value(
+								template=template_value,
+								data=data_value
+							):
+								raise Exception(f"Value '{template_value}' maybe has wrong format in data")
+				else:
+					raise Exception(f"Data in wrong type format")
+			except Exception as e:
+				print(f"{str(e)}")
+				return False
+			else:
+				return True		
+	def check_file_format(
+		self,
+		template : Type[T_EDGE_EMBEDDING_TEMPLATE],
+		data: Any
+	) -> bool:
+		try:
+			if not data:
+				raise Exception(f"data was empty")
+			if not template:
+				raise Exception(f"template was empty")
+			if not type(data) == type(template):
+				raise Exception(f"data and template have different types.")
+			return self.deep_type_value(
+				template=template,
+				data=data
+			)
+		except Exception as e:
+			print(f"{str(e)}")
+			return False

@@ -100,13 +100,10 @@ class ReadNodeEmbedding(BaseReadEmbedding):
 				data=header
 			):
 				raise Exception(f"Out of node embedding format.")
-			# if key not in header:
-			# 	raise Exception(f"No {key} has found")
 			node_list = lines[1].strip().split()
 			# Split each element of the list by space to get the values
 			values = [row.strip().split() for row in lines[2:]]
 			data = {node_list[i]:{header[j]:values[j-1][i] for j in range(1, len(header))} for i in range(len(node_list))}	
-			print()
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -124,12 +121,12 @@ class ReadNodeEmbedding(BaseReadEmbedding):
 			with open(file_path, "r") as json_file:
 				data = json.load(json_file)
 			if not self.check_file_format(
-				template=NODE_READ_FROM[".csv"],
+				template=NODE_READ_FROM[".json"],
 				data=data
 			):
 				raise Exception(f"Out of node embedding format.")
-			# if isinstance(data,dict) and key in data:
-			# 	data = data[key]
+			if "node" in data:
+				data = data["node"]
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -153,8 +150,6 @@ class ReadNodeEmbedding(BaseReadEmbedding):
 					data=header
 				):
 					raise Exception(f"Out of node embedding format.")
-				# if key not in header:
-				# 	raise Exception(f"No {key} has found")
 				for row in csv_reader:
 					node = row[0]
 					node_atts = {
@@ -170,28 +165,84 @@ class ReadNodeEmbedding(BaseReadEmbedding):
 		else:
 			self.data = data
 			return True
-	def check_file_format(
+	def deep_type_value(
 		self,
-		template : Type[NODE_EMBEDDING_TEMPLATE],
+		template: Any,
 		data: Any
 	) -> bool:
-		if isinstance(template, list) and isinstance(data, list):
-			# Check if the data is a list and each element in the data is a string
-			return all(isinstance(item, str) for item in data)
-		if isinstance(template, dict) and isinstance(data, dict):
-			for key, val in template.items():
-				# Skip the <any_key> and <any_val> checks
-				if key == "<any_key>" or val == "<any_val>":
-					continue
-				if key not in data or not isinstance(data[key], type(val)):
-					return False
-
-				if isinstance(val, dict) and not self.check_file_format(val, data[key]):
-					return False
-				
-			# Check if all keywords in the template exist in the data dictionary
-			template_keys_set = set(template.keys()) - {"<any_key>", "<any_val>"}
-			data_keys_set = set(data.keys())
-			return template_keys_set.issubset(data_keys_set)
-		## else
-		return False
+			try:
+				if not data:
+					raise Exception(f"data was empty")
+				if not template:
+					raise Exception(f"template was empty")
+				if not type(data) == type(template):
+					raise Exception(f"data and template have different types.")
+				if isinstance(template, list) and isinstance(data, list):
+					for value in template:
+						if isinstance(value, str):
+							if value == "<any_key>" or value == "<any_val>":
+								continue
+							if value not in data:
+								raise Exception(f"Value '{value}' missing in data")
+						elif isinstance(value, dict):
+							for data_value in data:
+								if not self.deep_type_value(
+									template=value,
+									data=data_value
+								):
+									raise Exception(f"Value '{template_value}' maybe has wrong format in data")
+				elif isinstance(template, dict) and isinstance(data, dict):
+					template_keys = template.keys()
+					for key in template_keys:
+						# Key can be any 
+						if not key == "<any_key>":
+							if key not in data.keys():
+								raise Exception(f"Key '{key}' missing in data")
+						template_value = template[key]
+						if not template_value == "<any_val>":
+							if key == "<any_key>":
+								# get the only key
+								data_value = data[next(iter(data.keys()))]
+							else:
+								data_value = data[key]
+							## value can be empty object
+							if not data_value:
+								return None
+							if not isinstance(data_value, type(template_value)):
+								raise Exception(f"Data value not instance with template")
+							if isinstance(template_value, str) and isinstance(data_value, str):
+								if not template_value == data_value:
+									raise Exception(f"Value '{template_value} missing in data")
+								else:
+									return True
+							if not self.deep_type_value(
+								template=template_value,
+								data=data_value
+							):
+								raise Exception(f"Value '{template_value}' maybe has wrong format in data")
+				else:
+					raise Exception(f"Data in wrong type format")
+			except Exception as e:
+				print(f"{str(e)}")
+				return False
+			else:
+				return True			
+	def check_file_format(
+		self,
+		template : Type[T_NODE_EMBEDDING_TEMPLATE],
+		data: Any
+	) -> bool:
+		try:
+			if not data:
+				raise Exception(f"data was empty")
+			if not template:
+				raise Exception(f"template was empty")
+			if not type(data) == type(template):
+				raise Exception(f"data and template have different types.")
+			return self.deep_type_value(
+				template=template,
+				data=data
+			)
+		except Exception as e:
+			print(f"{str(e)}")
+			return False
