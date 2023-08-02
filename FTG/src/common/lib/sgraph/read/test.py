@@ -37,36 +37,40 @@ def test_read_edge():
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\edgelist\\sample_graph_edgelist_edgeembedding.csv",
 		repr="edgelist"
 	)
+	print(edgeEmbedding.data)
 	edgeEmbedding.read(
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\adjlist\\sample_graph_adjlist_edgeembedding.json",
 		repr="adjlist"
 	)
+	print(edgeEmbedding.data)
 	edgeEmbedding.read(
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\adjmatrix\\sample_graph_adjmatrix_edgeembedding.json",
-		repr="adjlist"
+		repr="adjmatrix"
 	)
+	print(edgeEmbedding.data)
 	edgeEmbedding.read(
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\edgelist\\sample_graph_edgelist_edgeembedding.json",
 		repr="edgelist"
 	)
+	print(edgeEmbedding.data)
 	edgeEmbedding.read(
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\adjlist\\sample_graph_adjlist_edgeembedding.txt",
 		repr="adjlist"
 	)
+	print(edgeEmbedding.data)
 	edgeEmbedding.read(
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\adjmatrix\\sample_graph_adjmatrix_edgeembedding.txt",
 		repr="adjmatrix"
 	)
+	print(edgeEmbedding.data)
 	edgeEmbedding.read(
 		file_path="D:\\Research\\ComplexNetworks\\Complex-Networks-experiments\\FTG\\src\\common\\lib\\sgraph\\storegraph\\sample\\edgeembedding\\edgelist\\sample_graph_edgelist_edgeembedding.txt",
 		repr="edgelist"
 	)
 	print(edgeEmbedding.data)
 
-# test_read_graph()
+test_read_graph()
 
 test_read_node()
 
 test_read_edge()
-
-print()
