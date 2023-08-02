@@ -132,8 +132,8 @@ class ReadGraphEmbedding(BaseReadEmbedding):
 				data=data
 			):
 				raise Exception(f"Out of graph embedding format.")
-			# if isinstance(data,dict) and key in data:
-			# 	data = data[key]
+			if "graph" in data:
+				data = data["graph"]
 		except IOError as e:
 			print(f"{str(e)}")
 			return False
@@ -185,10 +185,18 @@ class ReadGraphEmbedding(BaseReadEmbedding):
 					raise Exception(f"data and template have different types.")
 				if isinstance(template, list) and isinstance(data, list):
 					for value in template:
-						if value == "<any_key>" or value == "<any_val>":
-							continue
-						if value not in data:
-							raise Exception(f"Value '{value}' missing in data")
+						if isinstance(value, str):
+							if value == "<any_key>" or value == "<any_val>":
+								continue
+							if value not in data:
+								raise Exception(f"Value '{value}' missing in data")
+						elif isinstance(value, dict):
+							for data_value in data:
+								if not self.deep_type_value(
+									template=value,
+									data=data_value
+								):
+									raise Exception(f"Value '{template_value}' maybe has wrong format in data")
 				elif isinstance(template, dict) and isinstance(data, dict):
 					template_keys = template.keys()
 					for key in template_keys:
@@ -197,8 +205,12 @@ class ReadGraphEmbedding(BaseReadEmbedding):
 							if key not in data.keys():
 								raise Exception(f"Key '{key}' missing in data")
 						template_value = template[key]
-						if not template_value == "<any_val>":						
-							data_value = data[key]
+						if not template_value == "<any_val>":
+							if key == "<any_key>":
+								# get the only key
+								data_value = data[next(iter(data.keys()))]
+							else:
+								data_value = data[key]
 							## value can be empty object
 							if not data_value:
 								return None
@@ -223,7 +235,7 @@ class ReadGraphEmbedding(BaseReadEmbedding):
 				return True		
 	def check_file_format(
 		self,
-		template : Type[GRAPH_EMBEDDING_TEMPLATE],
+		template : Type[T_GRAPH_EMBEDDING_TEMPLATE],
 		data: Any
 	) -> bool:
 		try:
@@ -240,5 +252,3 @@ class ReadGraphEmbedding(BaseReadEmbedding):
 		except Exception as e:
 			print(f"{str(e)}")
 			return False
-		else:
-			return True
